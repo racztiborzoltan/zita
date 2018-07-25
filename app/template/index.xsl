@@ -4,6 +4,11 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:php="http://php.net/xsl"
     >
+    
+    <xsl:template match="/">
+		<xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyDirectory', 'assets')" />
+		<xsl:apply-templates></xsl:apply-templates>
+    </xsl:template>
 
 	<xsl:template match="node()|@*">
 		<xsl:copy>
