@@ -6,7 +6,7 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"": "test/classes"
+			"": ["test/classes/", "tests/src/"]
 		}
 	},
 	"require": {
@@ -16,6 +16,12 @@
 		"psr/http-server-middleware": "^1.0",
 		"nyholm/psr7": "^0.3.0",
 		"narrowspark/http-emitter": "^0.6.0",
-		"atanvarno/middleware-dispatch": "^0.3.0"
+		"atanvarno/middleware-dispatch": "^0.3.0",
+		"psr/container": "^1.0",
+		"racztiborzoltan/stex": "^1.0",
+		"league/container": "^2.4"
+	},
+	"require-dev": {
+         "phpunit/phpunit": "^7.0"
 	}
 }
