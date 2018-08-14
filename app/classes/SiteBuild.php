@@ -44,28 +44,54 @@ class SiteBuild
         return $this->_destination_directory;
     }
 
-    /**
-     * Copy from source directory to destination directory
-     *
-     * @param string $relative_file_path
-     * @return bool Was the operation successful?
-     */
-    public function copyFile($relative_file_path): bool
+    protected function _copyFile(string $source_relative_file_path, string $path_prefix): string
     {
-        $source_full_path = $this->getSourceDirectory() . '/' . $relative_file_path;
-        $destination_full_path = $this->getDestinationDirectory() . '/' . $relative_file_path;
+        // If first parameter is absolute url:
+        if (preg_match('#^((https?):)?//#', $source_relative_file_path)) {
+            return $source_relative_file_path;
+        }
+        $destination_relative_file_path = $path_prefix . $source_relative_file_path;
+        $source_full_path = $this->getSourceDirectory() . '/' . $source_relative_file_path;
+        $destination_full_path = $this->getDestinationDirectory() . '/' . $destination_relative_file_path;
 
         if (!is_file($source_full_path)) {
-            throw new \InvalidArgumentException('File not found in source directory: ' . $relative_file_path);
+            throw new \InvalidArgumentException('File not found in source directory: ' . $source_relative_file_path);
         }
 
         if (!is_file($destination_full_path) || filemtime($source_full_path) > filemtime($destination_full_path) ) {
             if (!is_dir(dirname($destination_full_path))) {
                 mkdir(dirname($destination_full_path), 0777, true);
             }
-            return copy($source_full_path, $destination_full_path);
+            copy($source_full_path, $destination_full_path);
+            return $destination_relative_file_path;
         }
-        return true;
+        return $destination_relative_file_path;
+    }
+
+    /**
+     * Copy from source directory to destination directory
+     *
+     * @param string $source_relative_file_path
+     * @return string new relative file path or NULL
+     */
+    public function copyFile(string $source_relative_file_path): string
+    {
+        return $this->_copyFile($source_relative_file_path, '');
+    }
+
+    /**
+     * Copy from source directory to destination directory with path prefix
+     *
+     * Example:
+     * "assets/css/main.css" copy to "cache/assets/main.css"
+     *
+     * @param string $source_relative_file_path
+     * @param string $path_prefix
+     * @return string new relative file path or NULL
+     */
+    public function copyFileWithPathPrefix(string $source_relative_file_path, string $path_prefix): string
+    {
+        return $this->_copyFile($source_relative_file_path, $path_prefix);
     }
 
     /**
@@ -74,7 +100,7 @@ class SiteBuild
      * @param string $relative_directory_path
      * @return bool Was the operation successful?
      */
-    public function copyDirectory($relative_directory_path): bool
+    public function copyDirectory(string $relative_directory_path): bool
     {
         $source_dir_path = $this->getSourceDirectory() . '/' . $relative_directory_path;
         $destination_dir_path = $this->getDestinationDirectory() . '/' . $relative_directory_path;
