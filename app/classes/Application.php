@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace Zita\TestProject;
 
-use Nyholm\Psr7\Factory\ServerRequestFactory;
 use Narrowspark\HttpEmitter\SapiEmitter;
 use Zita\MiddlewareList;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Zita\ApplicationAwareInterface;
-use Zita\ApplicationAwareTrait;
 use Zita\XsltPhpFunctionContainer;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use DomOperationQueue\DomOperationQueue;
+use Zita\DomOperation\LoadHtmlFileDomOperation;
+use Zita\DomOperation\XsltDomOperation;
 
 class Application extends \Zita\Application
 {
@@ -31,11 +28,35 @@ class Application extends \Zita\Application
      */
     const SERVICE_NAME_SITEBUILD = 'sitebuild';
 
+    /**
+     * Name of DOM Operation list service in container object
+     * @var string
+     */
+    const SERVICE_NAME_DOM_OPERATION_LIST = 'dom_operation_list';
+
+    /**
+     * Return base dir of application
+     *
+     * @return string
+     */
     public function getBaseDir(): string
     {
         return $this->getContainer()->get(static::SERVICE_NAME_BASE_DIR);
     }
 
+    /**
+     * Return DomOperationQueue object
+     *
+     * @return DomOperationQueue
+     */
+    public function getDomOperationList(): DomOperationQueue
+    {
+        return $this->getContainer()->get(static::SERVICE_NAME_DOM_OPERATION_LIST);
+    }
+
+    /**
+     * initialization
+     */
     protected function _init()
     {
         $application = $this;
@@ -80,14 +101,33 @@ class Application extends \Zita\Application
 			return $sitebuild;
 		});
 
+		// dom operation list service:
+		$container->share($application::SERVICE_NAME_DOM_OPERATION_LIST, function(){
+		    return new \DomOperationQueue\DomOperationQueue();
+		});
+
 		XsltPhpFunctionContainer::setContainer($container);
 
-		$prepare_sitebuild_middleware = new \Zita\TestProject\SiteBuildPrepareMiddleware();
+		$this->_initDomOperationList($application->getDomOperationList());
+    }
 
-		$base_dir = $application->getContainer()->get($application::SERVICE_NAME_BASE_DIR);
-		$prepare_sitebuild_middleware->setHtmlFilePath(realpath($base_dir . '/sitebuild/index.html'));
-		$prepare_sitebuild_middleware->setApplication($application);
-		$application->getMiddlewareList()->add($prepare_sitebuild_middleware);
+    /**
+     * Initialize the Dom Operation list
+     *
+     * @param DomOperationQueue $dom_operation_list
+     */
+    protected function _initDomOperationList(DomOperationQueue $dom_operation_list)
+    {
+		$base_dir = $this->getContainer()->get(static::SERVICE_NAME_BASE_DIR);
+
+		$load_html_dom_operation = new LoadHtmlFileDomOperation();
+		$load_html_dom_operation->setHtmlFilePath(realpath($base_dir . '/sitebuild/index.html'));
+		$dom_operation_list->add($load_html_dom_operation);
+
+		$xslt_dom_operation = new XsltDomOperation();
+		$xslt_dom_operation->loadXslFilePath(realpath('../app/template/index.xsl'));
+		$dom_operation_list->add($xslt_dom_operation);
+
     }
 
     public function run()
