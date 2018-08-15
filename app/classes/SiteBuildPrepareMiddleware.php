@@ -8,10 +8,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Stex\SimpleTemplateXslt;
-use Zita\XsltUtils;
 use Zita\ApplicationAwareTrait;
 use Zita\ApplicationAwareInterface;
-use Zita\XsltUtils\CopyRelativeFileFromSourceToDestination;
 
 class SiteBuildPrepareMiddleware implements MiddlewareInterface, ApplicationAwareInterface
 {
@@ -41,10 +39,11 @@ class SiteBuildPrepareMiddleware implements MiddlewareInterface, ApplicationAwar
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-//         CopyRelativeFileFromSourceToDestination::getSourceDir();
-//         exit();
+        $response = $handler->handle($request);
 
-        XsltUtils::setContainer($this->getApplication()->getContainer());
+        //
+        // after request handler
+        //
 
         $html_file_path = $this->getHtmlFilePath();
 
@@ -66,18 +65,14 @@ class SiteBuildPrepareMiddleware implements MiddlewareInterface, ApplicationAwar
 
         $dom_document = $xslt_template->renderToDomDocument();
 
-        echo $dom_document->saveHTML($dom_document);
+        $html_content = $dom_document->saveHTML($dom_document);
 
-        exit();
-
-        echo $html_file_path;
-
-        echo '<br />';
-        echo '<br />';
-        echo '<br />';
-        exit(__METHOD__);
-
-        $response = $handler->handle($request);
+        $application = $this->getApplication();
+        /**
+         * @var \Psr\Http\Message\ResponseInterface $response
+         */
+        $response = $application->getContainer($application)->get($application::SERVICE_NAME_RESPONSE);
+        $response->getBody()->write($html_content);
 
         return $response;
     }

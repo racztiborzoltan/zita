@@ -44,7 +44,28 @@ class SiteBuild
         return $this->_destination_directory;
     }
 
-    protected function _copyFile(string $source_relative_file_path, string $path_prefix): string
+    /**
+     * Copy from source directory to destination directory
+     *
+     * @param string $source_relative_file_path
+     * @return string new relative file path or NULL
+     */
+    public function copyFile(string $source_relative_file_path): string
+    {
+        return $this->copyFileWithPathPrefix($source_relative_file_path, '');
+    }
+
+    /**
+     * Copy from source directory to destination directory with path prefix
+     *
+     * Example:
+     * "assets/css/main.css" copy to "cache/assets/main.css"
+     *
+     * @param string $source_relative_file_path
+     * @param string $path_prefix
+     * @return string new relative file path or NULL
+     */
+    public function copyFileWithPathPrefix(string $source_relative_file_path, string $path_prefix): string
     {
         // If first parameter is absolute url:
         if (preg_match('#^((https?):)?//#', $source_relative_file_path)) {
@@ -69,41 +90,32 @@ class SiteBuild
     }
 
     /**
-     * Copy from source directory to destination directory
-     *
-     * @param string $source_relative_file_path
-     * @return string new relative file path or NULL
-     */
-    public function copyFile(string $source_relative_file_path): string
-    {
-        return $this->_copyFile($source_relative_file_path, '');
-    }
-
-    /**
-     * Copy from source directory to destination directory with path prefix
-     *
-     * Example:
-     * "assets/css/main.css" copy to "cache/assets/main.css"
-     *
-     * @param string $source_relative_file_path
-     * @param string $path_prefix
-     * @return string new relative file path or NULL
-     */
-    public function copyFileWithPathPrefix(string $source_relative_file_path, string $path_prefix): string
-    {
-        return $this->_copyFile($source_relative_file_path, $path_prefix);
-    }
-
-    /**
      * Copy directory from source to destination
      *
-     * @param string $relative_directory_path
+     * @param string $source_relative_directory_path
      * @return bool Was the operation successful?
      */
-    public function copyDirectory(string $relative_directory_path): bool
+    public function copyDirectory(string $source_relative_directory_path): string
     {
-        $source_dir_path = $this->getSourceDirectory() . '/' . $relative_directory_path;
-        $destination_dir_path = $this->getDestinationDirectory() . '/' . $relative_directory_path;
+        return $this->copyDirectoryWithPathPrefix($source_relative_directory_path, '');
+    }
+
+    /**
+     * Copy directory from source to destination with path prefix
+     *
+     * Example:
+     * // all files in "assets" copy into "cache/assets"
+     * $class->copyDirectoryWithPathPrefix('assets', 'cache/');
+     *
+     * @param string $source_relative_directory_path
+     * @param string $path_prefix
+     * @return string new relative destination directory path
+     */
+    public function copyDirectoryWithPathPrefix(string $source_relative_directory_path, string $path_prefix): string
+    {
+        $destination_relative_directory_path = $path_prefix . $source_relative_directory_path;
+        $source_dir_path = $this->getSourceDirectory() . '/' . $source_relative_directory_path;
+        $destination_dir_path = $this->getDestinationDirectory() . '/' . $destination_relative_directory_path;
 
         if (!is_dir($source_dir_path)) {
             throw new \InvalidArgumentException('Directory not found in source directory');
@@ -119,7 +131,7 @@ class SiteBuild
                 continue;
             }
 
-            $this->copyFile($relative_directory_path . '/' . (str_replace($source_dir_path, '', $source_file->getPathname())));
+            $this->copyFileWithPathPrefix($source_relative_directory_path . '/' . (str_replace($source_dir_path, '', $source_file->getPathname())), $path_prefix);
         }
         unset($source_file, $source_files);
 
@@ -136,7 +148,7 @@ class SiteBuild
             }
 
             $destination_full_path = $destination_file->getPathname();
-            $relative_path = $relative_directory_path . '/' . (str_replace($destination_dir_path, '', $destination_file->getPathname()));
+            $relative_path = $source_relative_directory_path . '/' . (str_replace($destination_dir_path, '', $destination_file->getPathname()));
             $source_full_path = $this->getSourceDirectory() . '/' . $relative_path;
 
             if (file_exists($destination_full_path) && !file_exists($source_full_path) && $destination_file->isWritable()) {
@@ -150,6 +162,6 @@ class SiteBuild
         }
         unset($destination_file, $destination_files);
 
-        return true;
+        return $destination_relative_directory_path;
     }
 }

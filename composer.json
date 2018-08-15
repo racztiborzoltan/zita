@@ -14,12 +14,13 @@
 		"psr/http-message": "^1.0",
 		"psr/http-server-handler": "^1.0",
 		"psr/http-server-middleware": "^1.0",
-		"nyholm/psr7": "^0.3.0",
+		"nyholm/psr7": "^1.0.0",
 		"narrowspark/http-emitter": "^0.6.0",
 		"atanvarno/middleware-dispatch": "^0.3.0",
 		"psr/container": "^1.0",
+		"league/container": "^2.4",
 		"racztiborzoltan/stex": "^1.0",
-		"league/container": "^2.4"
+		"racztiborzoltan/dom-operation-queue": "^1.0"
 	},
 	"require-dev": {
          "phpunit/phpunit": "^7.0"

@@ -6,7 +6,7 @@
     >
     
     <xsl:template match="/">
-		<xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyDirectory', 'assets')" />
+		<xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyDirectoryWithPathPrefix', 'assets', 'cache/')" />
 		<xsl:apply-templates></xsl:apply-templates>
     </xsl:template>
 
@@ -23,16 +23,24 @@
     copy relative file paths in <link> tags into public directory
     -->
 	<xsl:template match="link[@rel='stylesheet'][@href]">
-        <xsl:copy-of select="."></xsl:copy-of>
-        <xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFile', string(@href))" />
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()"></xsl:apply-templates>
+			<xsl:attribute name="href">
+   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFileWithPathPrefix', string(@href), 'cache/')" />
+			</xsl:attribute>
+		</xsl:copy>
 	</xsl:template>
 
     <!-- 
     Copy relative image paths in <img> tags into public directory
     -->
 	<xsl:template match="img[@src]">
-        <xsl:copy-of select="."></xsl:copy-of>
-        <xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFile', string(@src))" />
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()"></xsl:apply-templates>
+			<xsl:attribute name="src">
+   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFileWithPathPrefix', string(@src), 'cache/')" />
+			</xsl:attribute>
+		</xsl:copy>
 	</xsl:template>
 
     <!-- 
