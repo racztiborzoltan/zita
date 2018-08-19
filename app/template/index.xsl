@@ -54,21 +54,48 @@
 			</xsl:attribute>
 		</xsl:copy>
 	</xsl:template>
+
+    <!--  
+    remove twitter icon
+    -->
+	<xsl:template match="//ul/li[a[contains(concat(' ',normalize-space(@class),' '), ' fa-twitter ')]]" priority="10">
+	   <!-- remove equivalent to doing nothing -->
+	</xsl:template>
 	
-	<xsl:template match="a[contains(concat(' ',normalize-space(@class),' '),' fa-facebook ')]">
+	<!--  
+	Set href of social links
+	-->
+	<xsl:template match="//footer[@id='footer']//ul[contains(concat(' ', normalize-space(@class), ' '), ' icons ')]/li">
         <xsl:copy>
-	        <xsl:attribute name="href">
-	            <xsl:value-of select="'https://www.facebook.com/facebook'"></xsl:value-of>
-	        </xsl:attribute>
-	        <xsl:apply-templates/>
+	        <xsl:choose>
+	            <xsl:when test="a[contains(concat(' ',normalize-space(@class),' '),' fa-facebook ')]">
+			        <xsl:attribute name="href">
+			            <xsl:value-of select="'https://www.facebook.com/facebook'"></xsl:value-of>
+			        </xsl:attribute>
+	            </xsl:when>
+	            <xsl:when test="a[contains(concat(' ',normalize-space(@class),' '),' fa-instagram ')]">
+			        <xsl:attribute name="href">
+			            <xsl:value-of select="'https://www.instagram.com'"></xsl:value-of>
+			        </xsl:attribute>
+	            </xsl:when>
+	            <xsl:when test="a[contains(concat(' ',normalize-space(@class),' '),' fa-envelope-o ')]">
+			        <xsl:attribute name="href">
+			            <xsl:value-of select="'mailto:email@domain.com'"></xsl:value-of>
+			        </xsl:attribute>
+	            </xsl:when>
+	        </xsl:choose>
+            <xsl:apply-templates select="node()|@*" />
         </xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="a[contains(concat(' ',normalize-space(@class),' '),' fa-twitter ')]">
-	   <xsl:call-template name="remove"></xsl:call-template>
-	</xsl:template>
-	
-	<xsl:template name="remove">
+	<!--  
+	change copyright
+	-->
+	<xsl:template match="footer[@id='footer']//div[contains(concat(' ', normalize-space(@class) ,' '), ' copyright ')]">
+        <xsl:copy>
+            <xsl:apply-templates select="node()|@*"></xsl:apply-templates>
+            <span> - Modified by XSLT</span>
+        </xsl:copy>
 	</xsl:template>
 
 </xsl:stylesheet>
