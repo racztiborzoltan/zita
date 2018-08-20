@@ -107,21 +107,20 @@ class Application extends \Zita\Application
 		// sitebuild service:
 		$container->share($application::SERVICE_NAME_SITEBUILD, function() use ($application){
 
-		    /**
-		     * @var \Psr\SimpleCache\CacheInterface $cache
-		     */
-		    $cache = $application->getContainer()->get(static::SERVICE_NAME_SIMPLE_CACHE);
-
-		    $cache_dir = realpath($application->getContainer()->get($application::SERVICE_NAME_BASE_DIR) . '/storage/cache');
-
-		    $cache_id = 'caminar_sitebuild.cache';
-		    $sitebuild_zip_path = $cache_dir . '/' . pathinfo($cache_id, PATHINFO_FILENAME) . '.zip';
-		    if (!$cache->has($cache_id)) {
-		        $sitebuild_zip_content = file_get_contents('https://templated.co/caminar/download');
-		        $cache->set($cache_id, $sitebuild_zip_content);
-		        file_put_contents($sitebuild_zip_path, $sitebuild_zip_content);
+		    // -------------------------------------------------------
+		    // Automatic downloading templates for sitebuild
+		    //
+		    $sitebuild_zip_path = realpath($application->getContainer()->get($application::SERVICE_NAME_BASE_DIR) . '/storage/cache') . '/caminar_sitebuild.zip';
+		    if (!is_file($sitebuild_zip_path)) {
+    		    if (!is_dir(dirname($sitebuild_zip_path))) {
+    		        mkdir(dirname($sitebuild_zip_path), 0777, true);
+    		    }
+    		    file_put_contents($sitebuild_zip_path, fopen('https://templated.co/caminar/download', 'r'));
 		    }
-		    $unzip_destination = $cache_dir . '/' . pathinfo($cache_id, PATHINFO_FILENAME);
+		    //
+		    // unzip:
+		    //
+		    $unzip_destination = dirname($sitebuild_zip_path) . '/' . pathinfo($sitebuild_zip_path, PATHINFO_FILENAME);
 		    if (!is_dir($unzip_destination)) {
 		        $zip = new \ZipArchive;
 		        if ($zip->open($sitebuild_zip_path) === TRUE) {
@@ -131,6 +130,7 @@ class Application extends \Zita\Application
 		            throw new \LogicException('sitebuild unzip is failed: ' . $zip->getStatusString());
 		        }
 		    }
+		    // -------------------------------------------------------
 
 			$sitebuild = new SiteBuild();
 			$base_dir = $application->getContainer()->get($application::SERVICE_NAME_BASE_DIR);
