@@ -1,15 +1,13 @@
 <?php
 namespace Zita\DomOperation;
 
-use DomOperationQueue\DomOperationInterface;
-
 /**
  * Dom Operation for html file loading into \DOMDocument
  *
  * @author Rácz Tibor Zoltán <racztiborzoltan@gmail.com>
  *
  */
-class LoadHtmlFileDomOperation implements DomOperationInterface
+class LoadHtmlFileDomOperation extends AbstractLoadHtmlDomOperation
 {
 
     /**
@@ -50,17 +48,6 @@ class LoadHtmlFileDomOperation implements DomOperationInterface
 
     public function executeDomOperation(\DOMDocument $dom_document): \DOMDocument
     {
-        $html_file_path = $this->getHtmlFilePath();
-
-        $html_file_content = file_get_contents($html_file_path);
-
-        $prev_libxml_use_internal_errors = libxml_use_internal_errors(true);
-        if (!empty($html_file_content)) {
-            $dom_document->loadHTML($html_file_content);
-        }
-        libxml_use_internal_errors($prev_libxml_use_internal_errors);
-        libxml_clear_errors();
-
-        return $dom_document;
+        return $this->_loadHtmlTextIntoDomDocument(file_get_contents($this->getHtmlFilePath()), $dom_document);
     }
 }
