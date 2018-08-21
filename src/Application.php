@@ -85,6 +85,7 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $request = $request->withAttribute($this->getRequestHandlerAttributeName(), $handler);
         return (new \Atanvarno\Middleware\Dispatch\SimpleDispatcher( ... $this->_prepareMiddlewares()))->process($request, $handler);
     }
 
