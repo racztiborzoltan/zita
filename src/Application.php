@@ -170,16 +170,6 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
         return $this->getContainer()->get(static::SERVICE_NAME_RESPONSE);
     }
 
-    public function issetRequestHandler(): bool
-    {
-        try {
-            $this->getRequestHandler();
-            return true;
-        } catch (\Psr\Container\NotFoundExceptionInterface $e) {
-            return false;
-        }
-    }
-
     protected function _getLazyRequestHandlerMiddleware(): MiddlewareInterface
     {
         $middleware = new LazyRequestHandlerMiddleware();
