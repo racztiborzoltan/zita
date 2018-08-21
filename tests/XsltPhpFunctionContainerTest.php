@@ -92,4 +92,27 @@ final class XsltPhpFunctionContainerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         XsltPhpFunctionContainer::INVALID_NAME();
     }
+
+    public function testAliasName()
+    {
+        XsltPhpFunctionContainer::clearAliases();
+        XsltPhpFunctionContainer::setAlias('test_value_1', 'test_value_1_alias');
+        $this->assertEquals('test_value_1', XsltPhpFunctionContainer::test_value_1_alias());
+
+        XsltPhpFunctionContainer::removeAlias('test_value_1_alias');
+        try {
+            XsltPhpFunctionContainer::test_value_1_alias();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+
+        XsltPhpFunctionContainer::clearAliases();
+        XsltPhpFunctionContainer::setAlias('test_value_1', 'test_value_1_alias');
+        XsltPhpFunctionContainer::removeAliasByOriginalName('test_value_1');
+        try {
+            XsltPhpFunctionContainer::test_value_1_alias();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+    }
 }

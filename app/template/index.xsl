@@ -6,7 +6,7 @@
     >
     
     <xsl:template match="/">
-		<xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyDirectoryWithPathPrefix', 'assets', 'cache/')" />
+		<xsl:variable name="temp" select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild_caminar', 'copyDirectoryWithPathPrefix', 'assets', 'cache/')" />
 		<xsl:apply-templates></xsl:apply-templates>
     </xsl:template>
 
@@ -26,7 +26,7 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"></xsl:apply-templates>
 			<xsl:attribute name="href">
-   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFileWithPathPrefix', string(@href), 'cache/')" />
+   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild_caminar', 'copyFileWithPathPrefix', string(@href), 'cache/')" />
 			</xsl:attribute>
 		</xsl:copy>
 	</xsl:template>
@@ -38,7 +38,7 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"></xsl:apply-templates>
 			<xsl:attribute name="src">
-   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFileWithPathPrefix', string(@src), 'cache/')" />
+   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild_caminar', 'copyFileWithPathPrefix', string(@src), 'cache/')" />
 			</xsl:attribute>
 		</xsl:copy>
 	</xsl:template>
@@ -50,7 +50,7 @@
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"></xsl:apply-templates>
 			<xsl:attribute name="src">
-   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild', 'copyFileWithPathPrefix', string(@src), 'cache/')" />
+   				<xsl:value-of select="php:function('\Zita\XsltPhpFunctionContainer::sitebuild_caminar', 'copyFileWithPathPrefix', string(@src), 'cache/')" />
 			</xsl:attribute>
 		</xsl:copy>
 	</xsl:template>

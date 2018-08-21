@@ -22,11 +22,11 @@ class Application extends \Zita\Application
     const SERVICE_NAME_BASE_DIR = 'base_dir';
 
     /**
-     * Name of sitebuild servce in container object
+     * Name of sitebuild variant servce in container object
      *
      * @var string
      */
-    const SERVICE_NAME_SITEBUILD = 'sitebuild';
+    const SERVICE_NAME_SITEBUILD_CAMINAR = 'sitebuild_caminar';
 
     /**
      * Name of DOM Operation list service in container object
@@ -105,7 +105,7 @@ class Application extends \Zita\Application
 		});
 
 		// sitebuild service:
-		$container->share($application::SERVICE_NAME_SITEBUILD, function() use ($application){
+		$container->share($application::SERVICE_NAME_SITEBUILD_CAMINAR, function() use ($application){
 
 		    // -------------------------------------------------------
 		    // Automatic downloading templates for sitebuild
@@ -161,6 +161,7 @@ class Application extends \Zita\Application
 		});
 
 		XsltPhpFunctionContainer::setContainer($container);
+		XsltPhpFunctionContainer::setAlias($application::SERVICE_NAME_SITEBUILD_CAMINAR, 'sitebuild');
 
 		$this->_initDomOperationList($application->getDomOperationList());
     }
@@ -177,7 +178,7 @@ class Application extends \Zita\Application
         /**
          * @var SiteBuild $sitebuild
          */
-        $sitebuild = $this->getContainer()->get(static::SERVICE_NAME_SITEBUILD);
+        $sitebuild = $this->getContainer()->get(static::SERVICE_NAME_SITEBUILD_CAMINAR);
 
 		$load_html_dom_operation = new LoadHtmlFileDomOperation();
 		$load_html_dom_operation->setHtmlFilePath(realpath($sitebuild->getSourceDirectory() . '/index.html'));

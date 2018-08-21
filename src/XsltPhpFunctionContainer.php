@@ -11,16 +11,122 @@ abstract class XsltPhpFunctionContainer
      */
     private static $_container = null;
 
+    /**
+     * Alias service names
+     *
+     * Structure:
+     * Array(
+     *  'ALIAS_NAME' => 'ORIGINAL_NAME',
+     * )
+     * @var array
+     */
+    private static $_aliases = [];
+
+    /**
+     * Throwable handler for exceptions
+     *
+     * @var callable
+     */
     private static $_throwable_handler = null;
 
+    /**
+     * Set container object
+     *
+     * @param ContainerInterface $container
+     */
     public static function setContainer(ContainerInterface $container)
     {
         self::$_container = $container;
     }
 
+    /**
+     * Return container object
+     *
+     * @return ContainerInterface
+     */
     public static function getContainer(): ContainerInterface
     {
         return self::$_container;
+    }
+
+    /**
+     * Set alias name
+     *
+     * @param string $original_name
+     * @param string $alias_name
+     * @param boolean $overwrite_exists_alias
+     * @throws \InvalidArgumentException
+     */
+    public static function setAlias(string $original_name, string $alias_name, bool $overwrite_exists_alias = true)
+    {
+        if (isset(static::$_aliases[$alias_name]) && !$overwrite_exists_alias) {
+            throw new \InvalidArgumentException('Alias is already exists: "'.$alias_name.'"');
+        }
+        static::$_aliases[$alias_name] = $original_name;
+    }
+
+    /**
+     * Remove alias
+     *
+     * @param string $alias_name
+     */
+    public static function removeAlias(string $alias_name)
+    {
+        unset(static::$_aliases[$alias_name]);
+    }
+
+    /**
+     * Remove all alias
+     */
+    public static function clearAliases()
+    {
+        static::$_aliases = [];
+    }
+
+    /**
+     * Remove alias by original name
+     *
+     * @param string $alias_name
+     */
+    public static function removeAliasByOriginalName(string $original_name)
+    {
+        foreach (static::$_aliases as $key => $value) {
+            if ($value == $original_name) {
+                unset(static::$_aliases[$key]);
+            }
+        }
+    }
+
+    /**
+     * Check if alias exists to original name
+     * @param string $original_name
+     * @return array
+     */
+    public static function hasAlias(string $original_name): bool
+    {
+        return isset(static::$_aliases[$original_name]);
+    }
+
+    /**
+     * Return alias to original name
+     *
+     * @param string $original_name
+     * @param string $default_value default value if alias not exists
+     * @return array
+     */
+    public static function getAlias(string $original_name, ?string $default_value = null): ?string
+    {
+        return static::hasAlias($original_name) ? static::$_aliases[$original_name] : $default_value;
+    }
+
+    /**
+     * Returns all alias
+     *
+     * @return array
+     */
+    public static function getAliases(): array
+    {
+        return static::$_aliases;
     }
 
     /**
@@ -61,6 +167,13 @@ abstract class XsltPhpFunctionContainer
     {
         try {
             $container_item_name;
+
+            // find alias if the first parameter is not exists in container:
+            if (!static::getContainer()->has($container_item_name) && static::hasAlias($container_item_name)) {
+                $original_name = static::getAlias($container_item_name);
+                $container_item_name = $original_name;
+            }
+
             $item = static::getContainer()->get($container_item_name);
             if (is_object($item)) {
                 if (method_exists($item, '__invoke') && ( count($args) == 0 || !method_exists($item, reset($args)) ) ) {
@@ -81,6 +194,6 @@ abstract class XsltPhpFunctionContainer
             }
         }
 
-        throw new \InvalidArgumentException('not found scalar or callable value');
+        throw new \InvalidArgumentException('not found scalar or callable value: ' . $container_item_name);
     }
 }
