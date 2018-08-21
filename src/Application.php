@@ -27,13 +27,6 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
     const SERVICE_NAME_REQUEST = 'request';
 
     /**
-     * Name of request handler servce in container object
-     *
-     * @var string
-     */
-    const SERVICE_NAME_REQUEST_HANDLER = 'request_handler';
-
-    /**
      * Name of response servce in container object
      *
      * @var string
@@ -46,6 +39,13 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
      * @var ContainerInterface
      */
     private $_container = null;
+
+    /**
+     * Attribute name of request handler in request object
+     *
+     * @var string
+     */
+    private $_request_handler_attribute_name = 'request-handler';
 
     /**
      * Returns instance of PSR-11 ContainerInterface
@@ -74,19 +74,13 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
         foreach ($middleware_list as $middleware) {
             $middlewares[] = $middleware;
         }
-        if ($this->issetRequestHandler()) {
-            $middlewares[] = static::_getLazyRequestHandlerMiddleware($this);
-        }
+        $middlewares[] = $this->_getLazyRequestHandlerMiddleware();
         return $middlewares;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $middlewares = $this->_prepareMiddlewares();
-        if (empty($middlewares)) {
-            throw new \LogicException('There are no middleware or request handler. Use before ->getMiddlewareList()->add() and/or ->setRequestHandler() method.');
-        }
-        return (new \Atanvarno\Middleware\Dispatch\SimpleDispatcher(...$middlewares))->handle($request);
+        return (new \Atanvarno\Middleware\Dispatch\SimpleDispatcher( ... $this->_prepareMiddlewares()))->handle($request);
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -116,13 +110,54 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
     }
 
     /**
-     * Returns RequestHandlerInterface object
+     * Set attribute name of request handler in request object
      *
+     * @param string $attribute_name
+     * @return self
+     */
+    public function setRequestHandlerAttributeName(string $attribute_name): self
+    {
+        $this->_request_handler_attribute_name = $attribute_name;
+        return $this;
+    }
+
+    /**
+     * Return attribute name of request handler in request object
+     *
+     * @return string
+     */
+    public function getRequestHandlerAttributeName()
+    {
+        return $this->_request_handler_attribute_name;
+    }
+
+    /**
+     * Check if isset request handler object
+     *
+     * @param ServerRequestInterface $request optional request object
+     * @return bool
+     */
+    public function hasRequestHandler(ServerRequestInterface $request = null): bool
+    {
+        if (is_null($request)) {
+            $request = $this->getRequest();
+        }
+        $request_handler = $request->getAttribute($this->getRequestHandlerAttributeName());
+        return !empty($request_handler) && $request_handler instanceof RequestHandlerInterface;
+    }
+
+    /**
+     * Returns request handler object
+     *
+     * @param ServerRequestInterface $request optional request object
      * @return RequestHandlerInterface
      */
-    public function getRequestHandler(): RequestHandlerInterface
+    public function getRequestHandler(ServerRequestInterface $request = null): RequestHandlerInterface
     {
-        return $this->getContainer()->get(static::SERVICE_NAME_REQUEST_HANDLER);
+        if (is_null($request)) {
+            $request = $this->getRequest();
+        }
+        return $request->getAttribute($this->getRequestHandlerAttributeName());
     }
 
     /**
@@ -145,26 +180,10 @@ class Application implements RequestHandlerInterface, MiddlewareInterface
         }
     }
 
-    protected static function _getLazyRequestHandlerMiddleware(Application $application): MiddlewareInterface
+    protected function _getLazyRequestHandlerMiddleware(): MiddlewareInterface
     {
-        return (new class() implements MiddlewareInterface {
-
-            /**
-             *
-             * @var Application
-             */
-            private $_application;
-
-            public function setApplication(Application $application)
-            {
-                $this->_application = $application;
-                return $this;
-            }
-
-            public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-            {
-                return $this->_application->getRequestHandler()->handle($request);
-            }
-        })->setApplication($application);
+        $middleware = new LazyRequestHandlerMiddleware();
+        $middleware->setApplication($this);
+        return $middleware;
     }
 }

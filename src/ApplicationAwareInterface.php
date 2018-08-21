@@ -2,7 +2,6 @@
 namespace Zita;
 
 /**
- *
  * Application aware interface
  *
  * @author Rácz Tibor Zoltán <racztiborzoltan@gmail.com>

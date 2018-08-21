@@ -1,22 +1,31 @@
 <?php
-declare(strict_types = 1);
-namespace Zita\TestProject;
+declare(strict_types=1);
 
-use Psr\Http\Server\RequestHandlerInterface;
+namespace Zita\TestProject\Middlewares;
+
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zita\ApplicationAwareInterface;
-use Zita\ApplicationAwareTrait;
+use Zita\TestProject\ApplicationAwareTrait;
 
-/**
- * Default request handler
- *
- * @author Rácz Tibor Zoltán <racztiborzoltan@gmail.com>
- *
- */
-class RequestHandler implements RequestHandlerInterface, ApplicationAwareInterface
+class CaminarMiddleware implements MiddlewareInterface, RequestHandlerInterface
 {
     use ApplicationAwareTrait;
+
+    public function matchRequest(ServerRequestInterface $request): bool
+    {
+        return $this->getApplication()->getPathInfo()->getPath() === '/caminar';
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        if ($this->matchRequest($request)) {
+            $request = $request->withAttribute($this->getApplication()->getRequestHandlerAttributeName(), $this);
+        }
+
+        return $handler->handle($request);
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

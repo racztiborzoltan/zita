@@ -1,0 +1,40 @@
+
+ErrorDocument 404 "404 - Page not found"
+
+AcceptPathInfo On
+
+# original: https://github.com/laravel/laravel/blob/v5.6.12/public/.htaccess
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Rewrite all to index.php
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+#
+# Apache module checks
+#
+<IfModule !mod_rewrite.c>
+	Options -Indexes 
+	DirectoryIndex 
+	ErrorDocument 403 "mod_rewrite Apache module is required!"
+	ErrorDocument 404 "mod_rewrite Apache module is required!"
+</IfModule>
+#<IfModule !mod_OTHER_MODULE.c>
+#	ErrorDocument 403 "mod_OTHER_MODULE Apache module is required!"
+#	ErrorDocument 404 "mod_OTHER_MODULE Apache module is required!"
+#	Options -Indexes 
+#	DirectoryIndex 
+#    RewriteEngine Off
+#</IfModule>
