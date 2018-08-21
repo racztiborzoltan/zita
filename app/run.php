@@ -5,8 +5,10 @@ namespace Zita\TestProject;
 use Zita\TestProject\Middlewares\CaminarMiddleware;
 use Zita\TestProject\Middlewares\MainPageMiddleware;
 use Zita\TestProject\Middlewares\PageNotFoundMiddleware;
+use Narrowspark\HttpEmitter\SapiEmitter;
 
 call_user_func(function(){
+
     /**
      * @var \Composer\Autoload\ClassLoader $autoloader
      */
@@ -21,5 +23,10 @@ call_user_func(function(){
     $application->getMiddlewareList()->add((new MainPageMiddleware())->setApplication($application));
     $application->getMiddlewareList()->add((new PageNotFoundMiddleware())->setApplication($application));
 
-    $application->run();
+    // request --> request handler --> response
+    $request = $application->getRequest();
+    $response = $application->handle($request);
+
+    (new SapiEmitter())->emit($response);
+
 });

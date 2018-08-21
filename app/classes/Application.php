@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Zita\TestProject;
 
-use Narrowspark\HttpEmitter\SapiEmitter;
 use Zita\MiddlewareList;
 use Zita\XsltPhpFunctionContainer;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -264,23 +263,5 @@ class Application extends \Zita\Application
 		$xslt_dom_operation->loadXslFilePath(realpath('../app/template/index.xsl'));
 		$dom_operation_list->add($xslt_dom_operation);
 
-    }
-
-    public function run()
-    {
-        $application = $this;
-
-        $container = $application->getContainer();
-
-        // request --> request handler --> response
-        $request = $container->get($application::SERVICE_NAME_REQUEST);
-//         $request_handler = $application->getRequestHandler();
-		//
-		// @todo test with ->process() method
-		//
-//         $response = $application->process($request, $request_handler);
-        $response = $application->handle($request);
-
-		(new SapiEmitter())->emit($response);
     }
 }
