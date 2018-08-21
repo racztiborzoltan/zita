@@ -102,6 +102,26 @@ class Application extends \Zita\Application
     }
 
     /**
+     * Return cache object
+     *
+     * @return \Psr\Cache\CacheItemPoolInterface
+     */
+    public function getCache(): \Psr\Cache\CacheItemPoolInterface
+    {
+        return $this->getContainer()->get(static::SERVICE_NAME_CACHE);
+    }
+
+    /**
+     * Return simple cache object
+     *
+     * @return \Psr\SimpleCache\CacheInterface
+     */
+    public function getSimpleCache(): \Psr\SimpleCache\CacheInterface
+    {
+        return $this->getContainer()->get(static::SERVICE_NAME_SIMPLE_CACHE);
+    }
+
+    /**
      * initialization
      *
      * @throws \LogicException
@@ -164,7 +184,7 @@ class Application extends \Zita\Application
 		    // -------------------------------------------------------
 		    // Automatic downloading templates for sitebuild
 		    //
-		    $sitebuild_zip_path = realpath($application->getContainer()->get($application::SERVICE_NAME_BASE_DIR) . '/storage/cache') . '/caminar_sitebuild.zip';
+		    $sitebuild_zip_path = realpath($application->getBaseDir() . '/storage/cache') . '/caminar_sitebuild.zip';
 		    if (!is_file($sitebuild_zip_path)) {
     		    if (!is_dir(dirname($sitebuild_zip_path))) {
     		        mkdir(dirname($sitebuild_zip_path), 0777, true);
@@ -187,7 +207,7 @@ class Application extends \Zita\Application
 		    // -------------------------------------------------------
 
 			$sitebuild = new SiteBuild();
-			$base_dir = $application->getContainer()->get($application::SERVICE_NAME_BASE_DIR);
+			$base_dir = $application->getBaseDir();
 			$sitebuild->setSourceDirectory($unzip_destination);
 			$sitebuild->setDestinationDirectory($base_dir.'/public');
 			return $sitebuild;
@@ -200,7 +220,7 @@ class Application extends \Zita\Application
 
 		// cache service:
 		$container->share($application::SERVICE_NAME_CACHE, function() use ($application){
-		    $cache_dir = realpath($application->getContainer()->get($application::SERVICE_NAME_BASE_DIR) . '/storage/');
+		    $cache_dir = realpath($application->getBaseDir() . '/storage/');
 		    if (!$cache_dir) {
 		        throw new \LogicException('cache dir is not exists!');
 		    }
@@ -211,7 +231,7 @@ class Application extends \Zita\Application
 
 		// simple cache service:
 		$container->share($application::SERVICE_NAME_SIMPLE_CACHE, function() use ($application){
-		    return $application->getContainer()->get($application::SERVICE_NAME_CACHE);
+		    return $application->getCache();
 		});
 
 		XsltPhpFunctionContainer::setContainer($container);
