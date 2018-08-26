@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Zita\TestProject;
 
 use Zita\MiddlewareList;
-use Zita\XsltPhpFunctionContainer;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use DomOperationQueue\DomOperationQueue;
 use Zita\DomOperation\LoadHtmlFileDomOperation;
-use Zita\DomOperation\XsltDomOperation;
 use Psr\Http\Message\UriInterface;
+use Zita\DomOperation\StexXsltProcessorDomOperation;
+use Stex\StexXsltProcessor;
 
 class Application extends \Zita\Application
 {
@@ -233,9 +233,6 @@ class Application extends \Zita\Application
 		    return $application->getCache();
 		});
 
-		XsltPhpFunctionContainer::setContainer($container);
-		XsltPhpFunctionContainer::setAlias($application::SERVICE_NAME_SITEBUILD_CAMINAR, 'sitebuild');
-
 		$this->_initDomOperationList($application->getDomOperationList());
 
 		return $this;
@@ -259,9 +256,12 @@ class Application extends \Zita\Application
 		$load_html_dom_operation->setHtmlFilePath(realpath($sitebuild->getSourceDirectory() . '/index.html'));
 		$dom_operation_list->add($load_html_dom_operation);
 
-		$xslt_dom_operation = new XsltDomOperation();
-		$xslt_dom_operation->loadXslFilePath(realpath('../app/template/index.xsl'));
-		$dom_operation_list->add($xslt_dom_operation);
+		$stex = new StexXsltProcessor();
+		$stex->setContainer($this->getContainer());
+		$stex_dom_operation = new StexXsltProcessorDomOperation();
+		$stex_dom_operation->setStex($stex);
+		$stex_dom_operation->loadXslFilePath(realpath('../app/template/index.xsl'));
+		$dom_operation_list->add($stex_dom_operation);
 
     }
 }

@@ -2,10 +2,10 @@
 namespace Zita\DomOperation;
 
 use DomOperationQueue\DomOperationInterface;
-use Stex\SimpleTemplateXslt;
+use Stex\StexXsltProcessor;
 
 /**
- * Dom Operation for xslt operations with stex (Simple TEmplate Xslt)
+ * Dom Operation for StexXsltProcesor
  *
  * XML document will be the first arugment of ->executeDomOperation() method
  * XSL document can be set with ->loadXslFilePath() or ->setXslDocument() methods.
@@ -13,13 +13,13 @@ use Stex\SimpleTemplateXslt;
  * @author Rácz Tibor Zoltán <racztiborzoltan@gmail.com>
  *
  */
-class XsltDomOperation implements DomOperationInterface
+class StexXsltProcessorDomOperation implements DomOperationInterface
 {
 
     /**
      * stex instance
      *
-     * @var SimpleTemplateXslt
+     * @var StexXsltProcessor
      */
     private $_stex = null;
 
@@ -33,10 +33,10 @@ class XsltDomOperation implements DomOperationInterface
     /**
      * Set stex instance
      *
-     * @param SimpleTemplateXslt $stex
+     * @param StexXsltProcessor $stex
      * @return self
      */
-    public function setStex(SimpleTemplateXslt $stex): self
+    public function setStex(StexXsltProcessor $stex): self
     {
         $this->_stex = $stex;
         return $this;
@@ -45,13 +45,13 @@ class XsltDomOperation implements DomOperationInterface
     /**
      * Returns stex instance
      *
-     * @param SimpleTemplateXslt $stex
+     * @param StexXsltProcessor $stex
      * @return self
      */
-    public function getStex(): SimpleTemplateXslt
+    public function getStex(): StexXsltProcessor
     {
         if (empty($this->_stex)) {
-            $this->_stex = new SimpleTemplateXslt();
+            throw new \LogicException('stex object is not set. Use before the following method: ->setStex()');
         }
         return $this->_stex;
     }
@@ -98,9 +98,9 @@ class XsltDomOperation implements DomOperationInterface
      * Set file path to xsl with lazy load
      *
      * @param string $xsl_file_path
-     * @return \Zita\DomOperation\XsltDomOperation
+     * @return self
      */
-    public function loadXslFilePath(string $xsl_file_path)
+    public function loadXslFilePath(string $xsl_file_path): self
     {
         $this->_xsl_document = $xsl_file_path;
         return $this;
@@ -111,17 +111,15 @@ class XsltDomOperation implements DomOperationInterface
         $stex = $this->getStex();
 
         $xml_document = $dom_document;
-        $stex->setXmlDocument($xml_document);
 
         /**
          * @var \DOMDocument $xsl_document
          */
         $xsl_document = $this->getXslDocument();
-        $stex->setXslDocument($xsl_document);
+        $stex->importStylesheet($xsl_document);
 
-        $proc = $stex->getXsltProcessor();
-        $proc->registerPHPFunctions();
+        $stex->registerPHPFunctions();
 
-        return $stex->renderToDomDocument();
+        return $stex->transformToDoc($xml_document);
     }
 }
