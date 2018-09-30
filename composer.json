@@ -19,7 +19,7 @@
 		"atanvarno/middleware-dispatch": "^0.3.0",
 		"psr/container": "^1.0",
 		"league/container": "^2.4",
-		"racztiborzoltan/stex": "^2.0",
+		"racztiborzoltan/stex": "^2.1",
 		"racztiborzoltan/dom-operation-queue": "^1.0",
 		"cache/filesystem-adapter": "^1.0"
 	},
