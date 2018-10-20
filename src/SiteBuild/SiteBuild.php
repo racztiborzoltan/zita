@@ -1,47 +1,133 @@
 <?php
 declare(strict_types=1);
 
-namespace Zita\TestProject;
+namespace Zita\SiteBuild;
 
-class SiteBuild
+use Psr\Http\Message\UriInterface;
+
+/**
+ * SiteBuild class
+ *
+ * @author Rácz Tibor Zoltán <racztiborzoltan@gmail.com>
+ *
+ */
+abstract class SiteBuild implements SiteBuildInterface
 {
+
+    private $_name = null;
+
+    private $_page_type = null;
+
+    private $_config = [];
 
     private $_source_directory = null;
 
     private $_destination_directory = null;
 
-    public function setSourceDirectory(string $source_directory): self
+    /**
+     * Public URI
+     *
+     * @var UriInterface
+     */
+    private $_public_url = null;
+
+    public function setName(string $name)
     {
-        $this->_source_directory = realpath($source_directory);
+        $this->_name = $name;
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->_name;
+    }
+
+    public function setPageType(string $page_type)
+    {
+        $valid_page_types = $this->getValidPageTypes();
+        if (!in_array($page_type, $valid_page_types)) {
+            $exception = new InvalidPageTypeException('invalid page type: ".$page_type.". Valid page types: ' . implode(', ', $valid_page_types));
+            $exception->setSiteBuild($this);
+            throw $exception;
+        }
+        $this->_page_type = $page_type;
+        return $this;
+    }
+
+    public function getPageType(): string
+    {
+        return $this->_page_type;
+    }
+
+    public function mergeConfig(array $config)
+    {
+        $this->_config = $this->_array_merge_recursive($this->_config, $config);
+        return $this;
+    }
+
+    protected function _array_merge_recursive($array1, $array2)
+    {
+        if (is_array($array1) && is_array($array2)) {
+            // If associative numeric indexed array:
+            if (in_array(false, array_map('is_numeric', array_keys($array2)))) {
+                foreach (array_keys($array2) as $key) {
+                    if (isset($array1[$key])) {
+                        $array1[$key] = $this->_array_merge_recursive($array1[$key], $array2[$key]);
+                    } else {
+                        $array1[$key] = $array2[$key];
+                    }
+                }
+                return $array1;
+            } else {
+                // if full numeric indexed array:
+                return $array2;
+            }
+        }
+        return $array2;
+    }
+
+    public function setConfig(array $config): array
+    {
+        $this->_config = $config;
+        return $this;
+    }
+
+    public function getConfig(): array
+    {
+        return $this->_config;
+    }
+
+    public function setSourceDirectory(string $source_directory)
+    {
+        $this->_source_directory = $source_directory;
         return $this;
     }
 
     public function getSourceDirectory(): string
     {
-        if (empty($this->_source_directory)) {
-            throw new \LogicException('Source directory is empty! Use before the following method: ->setDestinationDirectory()');
-        }
-        if (!is_dir($this->_source_directory)) {
-            throw new \LogicException('Source directory is not valid directory!');
-        }
         return $this->_source_directory;
     }
 
-    public function setDestinationDirectory(string $destination_directory): self
+    public function setDestinationDirectory(string $destination_directory)
     {
-        $this->_destination_directory = realpath($destination_directory);
+        $this->_destination_directory = $destination_directory;
         return $this;
     }
 
     public function getDestinationDirectory(): string
     {
-        if (empty($this->_destination_directory)) {
-            throw new \LogicException('Destination directory is empty! Use before the following method: ->setDestinationDirectory()');
-        }
-        if (!is_dir($this->_destination_directory)) {
-            throw new \LogicException('Destination directory is not valid directory!');
-        }
         return $this->_destination_directory;
+    }
+
+    public function setPublicUrl(UriInterface $public_url)
+    {
+        $this->_public_url = $public_url;
+        return $this;
+    }
+
+    public function getPublicUrl(): UriInterface
+    {
+        return $this->_public_url;
     }
 
     /**
@@ -93,7 +179,7 @@ class SiteBuild
      * Copy directory from source to destination
      *
      * @param string $source_relative_directory_path
-     * @return bool Was the operation successful?
+     * @return string new relative destination directory path
      */
     public function copyDirectory(string $source_relative_directory_path): string
     {
@@ -164,4 +250,8 @@ class SiteBuild
 
         return $destination_relative_directory_path;
     }
+
+    abstract public function getValidPageTypes(): array;
+
+    abstract public function render(): \Psr\Http\Message\ResponseInterface;
 }

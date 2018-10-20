@@ -5,11 +5,7 @@ namespace Zita\TestProject;
 
 use Zita\MiddlewareList;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use DomOperationQueue\DomOperationQueue;
-use Zita\DomOperation\LoadHtmlFileDomOperation;
 use Psr\Http\Message\UriInterface;
-use Zita\DomOperation\StexXsltProcessorDomOperation;
-use Stex\StexXsltProcessor;
 
 class Application extends \Zita\Application
 {
@@ -20,6 +16,13 @@ class Application extends \Zita\Application
      * @var string
      */
     const SERVICE_NAME_BASE_DIR = 'base_dir';
+
+    /**
+     * Name of public dir servce in container object
+     *
+     * @var string
+     */
+    const SERVICE_NAME_PUBLIC_DIR = 'public_dir';
 
     /**
      * Name of base uri servce in container object
@@ -34,19 +37,6 @@ class Application extends \Zita\Application
      * @var string
      */
     const SERVICE_NAME_PATH_INFO = 'path_info';
-
-    /**
-     * Name of sitebuild variant servce in container object
-     *
-     * @var string
-     */
-    const SERVICE_NAME_SITEBUILD_CAMINAR = 'sitebuild_caminar';
-
-    /**
-     * Name of DOM Operation list service in container object
-     * @var string
-     */
-    const SERVICE_NAME_DOM_OPERATION_LIST = 'dom_operation_list';
 
     /**
      * Name of cache service in container object
@@ -71,6 +61,16 @@ class Application extends \Zita\Application
     }
 
     /**
+     * Return public dir of application
+     *
+     * @return string
+     */
+    public function getPublicDir(): string
+    {
+        return $this->getContainer()->get(static::SERVICE_NAME_PUBLIC_DIR);
+    }
+
+    /**
      * Return base uri of application
      *
      * @return string
@@ -88,16 +88,6 @@ class Application extends \Zita\Application
     public function getPathInfo(): UriInterface
     {
         return $this->getContainer()->get(static::SERVICE_NAME_PATH_INFO);
-    }
-
-    /**
-     * Return DomOperationQueue object
-     *
-     * @return DomOperationQueue
-     */
-    public function getDomOperationList(): DomOperationQueue
-    {
-        return $this->getContainer()->get(static::SERVICE_NAME_DOM_OPERATION_LIST);
     }
 
     /**
@@ -135,6 +125,11 @@ class Application extends \Zita\Application
 		// base dir service:
 		$container->share($application::SERVICE_NAME_BASE_DIR, function(){
 		    return realpath(dirname(dirname(__DIR__)));
+		});
+
+		// public dir service:
+		$container->share($application::SERVICE_NAME_PUBLIC_DIR, function() use ($container, $application){
+		    return $container->get($application::SERVICE_NAME_BASE_DIR) . '/public';
 		});
 
 		// base uri service:
@@ -177,45 +172,10 @@ class Application extends \Zita\Application
 			return new \Nyholm\Psr7\Response();
 		});
 
-		// sitebuild service:
-		$container->share($application::SERVICE_NAME_SITEBUILD_CAMINAR, function() use ($application){
-
-		    // -------------------------------------------------------
-		    // Automatic downloading templates for sitebuild
-		    //
-		    $sitebuild_zip_path = realpath($application->getBaseDir() . '/storage/cache') . '/caminar_sitebuild.zip';
-		    if (!is_file($sitebuild_zip_path)) {
-    		    if (!is_dir(dirname($sitebuild_zip_path))) {
-    		        mkdir(dirname($sitebuild_zip_path), 0777, true);
-    		    }
-    		    file_put_contents($sitebuild_zip_path, fopen('https://templated.co/caminar/download', 'r'));
-		    }
-		    //
-		    // unzip:
-		    //
-		    $unzip_destination = dirname($sitebuild_zip_path) . '/' . pathinfo($sitebuild_zip_path, PATHINFO_FILENAME);
-		    if (!is_dir($unzip_destination)) {
-		        $zip = new \ZipArchive;
-		        if ($zip->open($sitebuild_zip_path) === TRUE) {
-		            $zip->extractTo($unzip_destination);
-		            $zip->close();
-		        } else {
-		            throw new \LogicException('sitebuild unzip is failed: ' . $zip->getStatusString());
-		        }
-		    }
-		    // -------------------------------------------------------
-
-			$sitebuild = new SiteBuild();
-			$base_dir = $application->getBaseDir();
-			$sitebuild->setSourceDirectory($unzip_destination);
-			$sitebuild->setDestinationDirectory($base_dir.'/public');
-			return $sitebuild;
-		});
-
-		// dom operation list service:
-		$container->share($application::SERVICE_NAME_DOM_OPERATION_LIST, function(){
-		    return new \DomOperationQueue\DomOperationQueue();
-		});
+// 		// dom operation list service:
+// 		$container->share($application::SERVICE_NAME_DOM_OPERATION_LIST, function(){
+// 		    return new \DomOperationQueue\DomOperationQueue();
+// 		});
 
 		// cache service:
 		$container->share($application::SERVICE_NAME_CACHE, function() use ($application){
@@ -233,35 +193,6 @@ class Application extends \Zita\Application
 		    return $application->getCache();
 		});
 
-		$this->_initDomOperationList($application->getDomOperationList());
-
 		return $this;
-    }
-
-    /**
-     * Initialize the Dom Operation list
-     *
-     * @param DomOperationQueue $dom_operation_list
-     */
-    protected function _initDomOperationList(DomOperationQueue $dom_operation_list)
-    {
-		// https://templated.co/caminar/download
-
-        /**
-         * @var SiteBuild $sitebuild
-         */
-        $sitebuild = $this->getContainer()->get(static::SERVICE_NAME_SITEBUILD_CAMINAR);
-
-		$load_html_dom_operation = new LoadHtmlFileDomOperation();
-		$load_html_dom_operation->setHtmlFilePath(realpath($sitebuild->getSourceDirectory() . '/index.html'));
-		$dom_operation_list->add($load_html_dom_operation);
-
-		$stex = new StexXsltProcessor();
-		$stex->setContainer($this->getContainer());
-		$stex_dom_operation = new StexXsltProcessorDomOperation();
-		$stex_dom_operation->setStex($stex);
-		$stex_dom_operation->loadXslFilePath(realpath('../app/template/index.xsl'));
-		$dom_operation_list->add($stex_dom_operation);
-
     }
 }

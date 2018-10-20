@@ -1,17 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace Zita\TestProject\Middlewares;
+namespace Zita\TestProject\Caminar;
 
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Zita\TestProject\ApplicationAwareTrait;
+use Zita\DomOperationListAwareTrait;
+use DomOperationQueue\DomOperationQueue;
 
 class CaminarMiddleware implements MiddlewareInterface, RequestHandlerInterface
 {
     use ApplicationAwareTrait;
+    use DomOperationListAwareTrait;
 
     public function matchRequest(ServerRequestInterface $request): bool
     {
@@ -37,7 +40,29 @@ class CaminarMiddleware implements MiddlewareInterface, RequestHandlerInterface
             $response = $response->withHeader('Content-Type', 'text/html;charset=utf-8');
         }
 
+        $this->_initDomOperationList($this->getDomOperationList());
+
         return $this->_executeDomOperationList($response);
+    }
+
+    /**
+     * Initialize the Dom Operation list
+     *
+     * @param DomOperationQueue $dom_operation_list
+     */
+    protected function _initDomOperationList(DomOperationQueue $dom_operation_list)
+    {
+		// https://templated.co/caminar/download
+
+        $application = $this->getApplication();
+
+        $dom_operation_template = new CaminarDomOperationTemplate();
+        $dom_operation_template->setApplication($application);
+
+        $dom_operation_template->setTemplateVariable('header_title', 'Zita Test Page');
+        $dom_operation_template->setTemplateVariable('header_subtitle', 'by Caminar template');
+
+        $dom_operation_list->add($dom_operation_template);
     }
 
     /**
@@ -57,7 +82,7 @@ class CaminarMiddleware implements MiddlewareInterface, RequestHandlerInterface
              * @var \Zita\TestProject\Application $application
              */
             $application = $this->getApplication();
-            $dom_operation_list = $application->getDomOperationList();
+            $dom_operation_list = $this->getDomOperationList();
             $dom_document = $this->_createDomDocumentFromResponse($response);
             /**
              * @var \DOMDocument $dom_document

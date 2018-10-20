@@ -2,7 +2,7 @@
 
 namespace Zita\TestProject;
 
-use Zita\TestProject\Middlewares\CaminarMiddleware;
+use Zita\TestProject\Caminar\CaminarMiddleware;
 use Zita\TestProject\Middlewares\MainPageMiddleware;
 use Zita\TestProject\Middlewares\PageNotFoundMiddleware;
 use Narrowspark\HttpEmitter\SapiEmitter;
