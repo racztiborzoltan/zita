@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "28c37a53cb425adfb35d0a32a691a56b",
+    "content-hash": "44085606ed96cacd44ded9abdbb5602d",
     "packages": [
         {
             "name": "atanvarno/middleware-dispatch",
@@ -63,16 +63,16 @@
         },
         {
             "name": "narrowspark/http-emitter",
-            "version": "v0.6.0",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/narrowspark/http-emitter.git",
-                "reference": "06c7106913dd3caf888e9846c834cbe5c00f4730"
+                "reference": "571aaff4437e95de21ee5c92dc9ee41a291d988e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/narrowspark/http-emitter/zipball/06c7106913dd3caf888e9846c834cbe5c00f4730",
-                "reference": "06c7106913dd3caf888e9846c834cbe5c00f4730",
+                "url": "https://api.github.com/repos/narrowspark/http-emitter/zipball/571aaff4437e95de21ee5c92dc9ee41a291d988e",
+                "reference": "571aaff4437e95de21ee5c92dc9ee41a291d988e",
                 "shasum": ""
             },
             "require": {
@@ -85,10 +85,7 @@
                 "psr/http-message-implementation": "^1.0"
             },
             "require-dev": {
-                "narrowspark/php-cs-fixer-config": "^3.0.1",
-                "phpstan/phpstan": "^0.9",
-                "phpstan/phpstan-phpunit": "^0.9",
-                "phpstan/phpstan-strict-rules": "^0.9",
+                "narrowspark/coding-standard": "^1.4.0",
                 "phpunit/phpunit": "^7.0",
                 "zendframework/zend-diactoros": "^1.7.0"
             },
@@ -121,7 +118,7 @@
                 "psr-7",
                 "sapi"
             ],
-            "time": "2018-06-06T13:56:42+00:00"
+            "time": "2018-10-31T12:31:29+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -445,16 +442,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.8.0",
+            "version": "v1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "3296adf6a6454a050679cde90f95350ad604b171"
+                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/3296adf6a6454a050679cde90f95350ad604b171",
-                "reference": "3296adf6a6454a050679cde90f95350ad604b171",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/c79c051f5b3a46be09205c73b80b346e4153e494",
+                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494",
                 "shasum": ""
             },
             "require": {
@@ -466,7 +463,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8-dev"
+                    "dev-master": "1.9-dev"
                 }
             },
             "autoload": {
@@ -500,7 +497,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-04-26T10:06:28+00:00"
+            "time": "2018-09-21T13:07:52+00:00"
         }
     ],
     "packages-dev": [],
