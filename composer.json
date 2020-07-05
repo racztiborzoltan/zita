@@ -1,0 +1,14 @@
+{
+    "name": "racztiborzoltan/zita",
+    "description": "Zita PHP framework",
+    "type": "libary",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rácz Tibor Zoltán",
+            "email": "racztiborzoltan@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
