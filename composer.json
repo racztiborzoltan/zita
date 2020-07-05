@@ -15,7 +15,7 @@
 		"psr/http-server-handler": "^1.0",
 		"psr/http-server-middleware": "^1.0",
 		"nyholm/psr7": "^0.3.0",
-		"narrowspark/http-emitter": "^0.6.0",
+		"narrowspark/http-emitter": "^0.8.0",
 		"atanvarno/middleware-dispatch": "^0.3.0"
 	}
 }

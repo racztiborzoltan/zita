@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba68e98018a86c45e51c45869b4f1bad",
+    "content-hash": "37a848f7f07627f51940e62480a6d3ad",
     "packages": [
         {
             "name": "atanvarno/middleware-dispatch",
@@ -111,38 +111,34 @@
                 "request",
                 "response"
             ],
+            "abandoned": "psr/http-factory",
             "time": "2017-03-24T14:48:51+00:00"
         },
         {
             "name": "narrowspark/http-emitter",
-            "version": "v0.6.0",
+            "version": "0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/narrowspark/http-emitter.git",
-                "reference": "06c7106913dd3caf888e9846c834cbe5c00f4730"
+                "reference": "19044447b8cb6a821a72ace3e343b10782f4600e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/narrowspark/http-emitter/zipball/06c7106913dd3caf888e9846c834cbe5c00f4730",
-                "reference": "06c7106913dd3caf888e9846c834cbe5c00f4730",
+                "url": "https://api.github.com/repos/narrowspark/http-emitter/zipball/19044447b8cb6a821a72ace3e343b10782f4600e",
+                "reference": "19044447b8cb6a821a72ace3e343b10782f4600e",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1",
-                "psr/http-message": "^1.0",
-                "symfony/polyfill-mbstring": "^1.8.0"
+                "psr/http-message": "^1.0"
             },
             "provide": {
-                "psr/container-implementation": "^1.0",
                 "psr/http-message-implementation": "^1.0"
             },
             "require-dev": {
-                "narrowspark/php-cs-fixer-config": "^3.0.1",
-                "phpstan/phpstan": "^0.9",
-                "phpstan/phpstan-phpunit": "^0.9",
-                "phpstan/phpstan-strict-rules": "^0.9",
+                "narrowspark/coding-standard": "^1.4.0",
                 "phpunit/phpunit": "^7.0",
-                "zendframework/zend-diactoros": "^1.7.0"
+                "zendframework/zend-diactoros": "^1.8.0"
             },
             "type": "library",
             "autoload": {
@@ -173,7 +169,7 @@
                 "psr-7",
                 "sapi"
             ],
-            "time": "2018-06-06T13:56:42+00:00"
+            "time": "2019-03-08T14:27:56+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -433,65 +429,6 @@
                 "response"
             ],
             "time": "2018-01-22T17:08:31+00:00"
-        },
-        {
-            "name": "symfony/polyfill-mbstring",
-            "version": "v1.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "3296adf6a6454a050679cde90f95350ad604b171"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/3296adf6a6454a050679cde90f95350ad604b171",
-                "reference": "3296adf6a6454a050679cde90f95350ad604b171",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "suggest": {
-                "ext-mbstring": "For best performance"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.8-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Mbstring\\": ""
-                },
-                "files": [
-                    "bootstrap.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for the Mbstring extension",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "mbstring",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "time": "2018-04-26T10:06:28+00:00"
         }
     ],
     "packages-dev": [],
@@ -503,5 +440,6 @@
     "platform": {
         "php": ">=7.1"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
