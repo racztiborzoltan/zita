@@ -10,7 +10,12 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
+    "require": {
+        "psr/http-message": "^1.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "relay/relay": "^2.1"
+    },
     "autoload": {
         "psr-4": {
             "": "src/"

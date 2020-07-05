@@ -1,1 +1,6 @@
+# eclipse meta files
+.settings
+.project
+.buildpath
+
 /vendor/
