@@ -164,16 +164,16 @@
         },
         {
             "name": "relay/relay",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/relayphp/Relay.Relay.git",
-                "reference": "48dadb37247f93453191d16ee5c1993f5d06b7af"
+                "reference": "924fdf9473492d6d221bd7760a8f201f8b35d96c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/relayphp/Relay.Relay/zipball/48dadb37247f93453191d16ee5c1993f5d06b7af",
-                "reference": "48dadb37247f93453191d16ee5c1993f5d06b7af",
+                "url": "https://api.github.com/repos/relayphp/Relay.Relay/zipball/924fdf9473492d6d221bd7760a8f201f8b35d96c",
+                "reference": "924fdf9473492d6d221bd7760a8f201f8b35d96c",
                 "shasum": ""
             },
             "require": {
@@ -186,14 +186,13 @@
                 "psr/http-server-handler-implementation": "1.0"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^6.0",
-                "friendsofphp/php-cs-fixer": "^2.16",
+                "doctrine/coding-standard": "^9.0",
+                "friendsofphp/php-cs-fixer": "^3.0",
                 "laminas/laminas-diactoros": "~2.2",
                 "phpstan/phpstan": "^0.12.14",
-                "phpunit/phpunit": "~7.0",
+                "phpunit/phpunit": "~7.0 || ~9.5",
                 "roave/security-advisories": "dev-master",
-                "squizlabs/php_codesniffer": "^3.5",
-                "vimeo/psalm": "^3.9"
+                "vimeo/psalm": "^4.7"
             },
             "type": "library",
             "autoload": {
@@ -218,7 +217,7 @@
                 "psr-15",
                 "psr-7"
             ],
-            "time": "2020-03-18T20:42:42+00:00"
+            "time": "2021-05-23T05:42:52+00:00"
         }
     ],
     "packages-dev": [],
